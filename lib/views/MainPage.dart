@@ -17,7 +17,7 @@ class _MainPageState extends State<MainPage> {
       builder: (context, AsyncSnapshot<SessionSettings> settings) {
         if(settings.hasData) {
           if(settings.data.sessionToken == "") {
-            Future.microtask(() => Navigator.push(
+            Future.microtask(() => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => LoginPage())
             ));
