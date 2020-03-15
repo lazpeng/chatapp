@@ -2,7 +2,6 @@ import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/services/AccountService.dart';
 import 'package:chatapp/views/MainPage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -109,9 +108,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           Text("Date of birth (currently ${formatDob()})"),
                           const SizedBox(width: 20),
                           SizedBox(width: 100, child: RaisedButton(child: Text("Set"), onPressed: () {
-                            return DatePicker.showDatePicker(context, maxTime: DateTime.now(), onConfirm: (date) {
-                              _dateOfBirth = date;
-                              setState(() {});
+                            showDatePicker(context: context, initialDate: _dateOfBirth, 
+                                            firstDate: DateTime.fromMillisecondsSinceEpoch(0), 
+                                            lastDate: DateTime.now()).then((selected) {
+                              setState(() {
+                                _dateOfBirth = selected;
+                              });
                             });
                           }))
                         ]
