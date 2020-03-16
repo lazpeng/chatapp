@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(icon: Icon(Icons.person), hintText: "Username"),
                     initialValue: _username,
                     onChanged: (text) {
-                      _username = text;
+                      _username = text.trim();
                       setState(() {});
                     }
                   ),

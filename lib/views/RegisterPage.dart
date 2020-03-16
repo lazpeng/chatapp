@@ -67,15 +67,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text("Register", style: Theme.of(context).textTheme.headline4),
                       const SizedBox(height: 40),
                       TextFormField(decoration: InputDecoration(labelText: "Username"), initialValue: _username, onChanged: (text) {
-                        _username = text;
+                        _username = text.trim();
 
                         setState(() {});
                       }),
                       TextFormField(decoration: InputDecoration(labelText: "Full name (optional)"), initialValue: _fullName, onChanged: (text) {
-                        _fullName = text;
+                        _fullName = text.trim();
                       }),
                       TextFormField(decoration: InputDecoration(labelText: "Email"), initialValue: _email, onChanged: (text) {
-                        _email = text;
+                        _email = text.trim();
 
                         setState(() {});
                       }),

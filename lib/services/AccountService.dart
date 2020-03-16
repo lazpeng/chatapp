@@ -12,7 +12,7 @@ class AccountService extends BaseService {
     var errorMessage = "";
 
     try {
-      var url = await apiUrl("user/register");
+      var url = apiUrl("user/register");
 
       var body = user.toJsonMap();
 
@@ -38,7 +38,7 @@ class AccountService extends BaseService {
     var errorMessage = "";
 
     try {
-      var url = await apiUrl("session/login");
+      var url = apiUrl("session/login");
 
       var body = {
         "username": username,

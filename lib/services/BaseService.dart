@@ -1,15 +1,8 @@
-import 'package:chatapp/models/ServerSettings.dart';
-
 abstract class BaseService {
-  ServerSettings _settings;
-  bool _useHttps = false;
+  String _host = "onakan-chatserver.herokuapp.com";
 
-  Future<String> apiUrl(String endpoint) async {
-    if(_settings == null) {
-      _settings = await ServerSettings.load();
-    }
-
-    return (_useHttps ? "https" : "http") + "://${_settings.host}:${_settings.port}/api/$endpoint";
+  String apiUrl(String endpoint) {
+    return "https://$_host/api/$endpoint";
   }
 
   Map<String, String> getHeaders() {
