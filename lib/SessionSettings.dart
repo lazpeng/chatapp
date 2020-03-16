@@ -27,7 +27,7 @@ class SessionSettings {
     pref.setString(_KEY_ID, id);
   }
 
-  static void logout() async {
+  static Future logout() async {
     var pref = await SharedPreferences.getInstance();
 
     pref.remove(_KEY_TOKEN);
