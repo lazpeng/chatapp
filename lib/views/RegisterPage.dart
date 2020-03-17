@@ -1,3 +1,4 @@
+import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/services/AccountService.dart';
 import 'package:chatapp/views/MainPage.dart';
@@ -136,25 +137,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                               _loading = true;
 
-                              accountService.createAccount(user).then((message) {
+                              accountDomain.registerAccount(user).then((message) {
                                 setState(() { _loading = false; });
 
                                 if(message == "") {
-                                  accountService.performLogin(_username, _password, false).then((message) {
-                                    if(message == "") {
-                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
-                                    } else {
-                                      return showDialog(context: context, builder: (_) {
-                                        return AlertDialog(
-                                          title: Text("Login", style: Theme.of(context).textTheme.headline6),
-                                          content: Text("An error ocurred during first login: $message")
-                                        );
-                                      });
-                                    }
-
-                                    return null;
-                                  });
-
+                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
                                   return null;
                                 } else {
                                   return showDialog(context: context, builder: (_) {

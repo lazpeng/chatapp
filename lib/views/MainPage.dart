@@ -1,8 +1,11 @@
 import 'package:chatapp/SessionSettings.dart';
+import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/ChatModel.dart';
+import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/repositories/ChatRepository.dart';
 import 'package:chatapp/views/ProfileWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'LoginPage.dart';
 
@@ -14,6 +17,11 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
 
   int _currentNavIndex = 0;
+  ProfileWidget _profileWidget;
+
+  String _formatSentDate(DateTime t) {
+    return "${t.hour}:${t.minute}";
+  }
 
   Widget _buildChatFragment() {
     return FutureBuilder<List<ChatModel>>(
@@ -33,10 +41,24 @@ class _MainPageState extends State<MainPage> {
                   leading: CircleAvatar(child: Text(current.username[0].toUpperCase())),
                   title: Row(
                     children: [
-                      Text(current.lastMessage)
+                      Text(current.username)
                     ],
                   ),
-                  subtitle: Text(current.username),
+                  subtitle: Row(
+                    children: [
+                      current.isMine
+                      ? Text(current.lastMessage, overflow: TextOverflow.clip)
+                      : Row(
+                        children: [
+                          Icon(Icons.check),
+                          const SizedBox(width: 5),
+                          Text(current.lastMessage, overflow: TextOverflow.clip),
+                        ],
+                      ),
+                      Text(_formatSentDate(current.lastSentDate))
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
                 );
               },
             );
@@ -48,8 +70,58 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  Widget _buildFriendListFragment() {
+    return FutureBuilder(
+      future: accountDomain.getFriendList(),
+      builder: (context, AsyncSnapshot<List<UserModel>> bundle) {
+        if(bundle.hasData) {
+          var friends = bundle.data;
+
+          if(friends.length == 0) {
+            return Center(
+              child: Column(
+                children: [
+                  Text("No friends yet"),
+                  const SizedBox(height: 10),
+                  RaisedButton(child: Text("Send a friend request"), onPressed: () {},)
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              )
+            );
+          } else {
+            return null;
+          }
+        } else {
+          return Center(
+            child: CircularProgressIndicator()
+          );
+        }
+      }
+    );
+  }
+
   Widget _buildFriendsFragment() {
-    return Center(child: Text("Friends"));
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: TabBar(
+            tabs: [
+              Tab(text: "Friend list"),
+              Tab(text: "Pending"),
+              Tab(text: "Block list")
+            ]
+          )
+        ),
+        body: TabBarView(
+          children: [
+            _buildFriendListFragment(),
+            Text("No pending requests"),
+            Text("No blocked users")
+          ]
+        )
+      ),
+    );
   }
 
   Widget _buildCurrentFragment(context) {
@@ -58,7 +130,10 @@ class _MainPageState extends State<MainPage> {
         return _buildFriendsFragment();
         break;
       case 2:
-        return ProfileWidget.build(context, () {
+        if(_profileWidget == null) {
+          _profileWidget = new ProfileWidget(null);
+        }
+        return _profileWidget.build(context, () {
           setState(() {});
         });
         break;

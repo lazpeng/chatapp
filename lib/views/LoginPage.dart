@@ -1,3 +1,4 @@
+import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/services/AccountService.dart';
 import 'package:chatapp/views/RegisterPage.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() {
                                   duringLogin = true;
 
-                                  accountService.performLogin(_username, _password, false).then((message) {
+                                  accountDomain.performLogin(_username, _password, false).then((message) {
                                     if(message.isEmpty) {
                                       // Login was a success
                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));

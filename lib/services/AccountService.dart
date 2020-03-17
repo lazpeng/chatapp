@@ -8,7 +8,7 @@ import 'BaseService.dart';
 
 class AccountService extends BaseService {
 
-  Future<String> createAccount(UserModel user) async {
+  Future<dynamic> createAccount(UserModel user) async {
     var errorMessage = "";
 
     try {
@@ -23,6 +23,10 @@ class AccountService extends BaseService {
 
         if(responseMap['id'] == null) {
           errorMessage = response.body;
+        } else {
+          var user = UserModel.fromJsonMap(responseMap);
+
+          return user;
         }
       } else {
         errorMessage = response.body;
@@ -34,7 +38,7 @@ class AccountService extends BaseService {
     return errorMessage;
   }
 
-  Future<String> performLogin(String username, String password, bool appearOffline) async {
+  Future<Map<String, dynamic>> performLogin(String username, String password, bool appearOffline) async {
     var errorMessage = "";
 
     try {
@@ -49,16 +53,7 @@ class AccountService extends BaseService {
       var response = await post(url, body: jsonEncode(body), headers: getHeaders());
 
       if(response.statusCode == 200) {
-        var map = jsonDecode(response.body);
-
-        if(map['success']) {
-            var token = map['token'];
-            var id = map['userId'];
-
-            SessionSettings.login(id, token);
-        } else {
-          errorMessage = map['errorMessage'];
-        }
+        return jsonDecode(response.body);
       } else {
         errorMessage = response.body;
       }
@@ -66,7 +61,25 @@ class AccountService extends BaseService {
       errorMessage = e.toString();
     }
 
-    return errorMessage;
+    return { "errorMessage": errorMessage };
+  }
+
+  Future<UserModel> getUser(String id) async {
+    var session = await SessionSettings.load();
+    var url = apiUrl("user/get/$id");
+
+    var body = { "sourceId": session.userId, "token": session.sessionToken };
+
+    var response = await post(url, headers: getHeaders(), body: jsonEncode(body));
+
+    if(response.statusCode == 200) {
+      var responseMap = jsonDecode(response.body);
+      var user = UserModel.fromJsonMap(responseMap);
+
+      return user;
+    }
+
+    return null;
   }
 
   AccountService._internal();

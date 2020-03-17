@@ -1,17 +1,18 @@
+import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class BaseRepository {
   static const int _latestVersion = 1;
-  static Database _database;
 
   static _v0(Database db) async {
     await db.rawQuery("CREATE TABLE IF NOT EXISTS DbUpgrade (Version INT PRIMARY KEY, DateInstalled DATE)");
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS KnownUsers (Id CHAR(36) PRIMARY KEY, Username VARCHAR(128) NOT NULL,"+
      " FullName VARCHAR(256) NOT NULL, Email VARCHAR(256), Bio TEXT, AccountCreated TIMESTAMPTZ NOT NULL," +
-     " LastLogin TIMESTAMPTZ NOT NULL, LastSeen TIMESTAMPTZ NOT NULL, DateOfBirth DATE NOT NULL) ");
+     " LastLogin TIMESTAMPTZ NOT NULL, LastSeen TIMESTAMPTZ NOT NULL, DateOfBirth DATE NOT NULL, FindInSearch BOOL NOT NULL," +
+     " OpenChat BOOL NOT NULL)");
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Messages (Id INT PRIMARY KEY, FromId CHAR(36) NOT NULL," +
      " ToId CHAR(36) NOT NULL, Content TEXT NOT NULL, InReplyTo INT, DateSent DATETIME NOT NULL," +
@@ -30,27 +31,34 @@ abstract class BaseRepository {
   ];
 
   Future<Database> getDatabase() async {
-    var path = getApplicationDocumentsDirectory();
-    if(_database == null) {
-      _database = await openDatabase("$path/data.db", onOpen: (db) async {
-        while(true) {
-          var current;
+    String path;
+    Directory storageDir;
 
-          try {
-            var result = await db.rawQuery("SELECT IFNULL(MAX(Version), 0) as Version FROM DbUpgrade");
-            current = result[0]['Version'];
-          } catch (_) {
-            current = 0;
-          }
-
-          if(current < _latestVersion) {
-            await _upgradeFunctions[current](db);
-
-            await db.rawInsert("INSERT INTO DbUpgrade (Version, DateInstalled) VALUES (?, CURRENT_DATE)", [current+1]);
-          } else break;
-        }
-      });
+    if(Platform.isAndroid){
+      storageDir = await getExternalStorageDirectory();
     }
-    return _database;
+    else{
+      storageDir = await getLibraryDirectory();
+    }
+
+    path = storageDir.path.replaceAll("files", "databases");
+    return await openDatabase("$path/data.db", onOpen: (db) async {
+      while(true) {
+        var current;
+
+        try {
+          var result = await db.rawQuery("SELECT IFNULL(MAX(Version), 0) as Version FROM DbUpgrade");
+          current = result[0]['Version'];
+        } catch (_) {
+          current = 0;
+        }
+
+        if(current < _latestVersion) {
+          await _upgradeFunctions[current](db);
+
+          await db.rawInsert("INSERT INTO DbUpgrade (Version, DateInstalled) VALUES (?, CURRENT_DATE)", [current+1]);
+        } else break;
+      }
+    });
   }
 }
