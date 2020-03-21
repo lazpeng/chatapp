@@ -1,5 +1,4 @@
 import 'package:chatapp/domain/AccountDomain.dart';
-import 'package:chatapp/services/AccountService.dart';
 import 'package:chatapp/views/RegisterPage.dart';
 import 'package:flutter/material.dart';
 

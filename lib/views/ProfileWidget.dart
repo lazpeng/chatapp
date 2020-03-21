@@ -1,7 +1,6 @@
 import 'package:chatapp/SessionSettings.dart';
 import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/repositories/UserRepository.dart';
 import 'package:flutter/material.dart';
 
 class _ProfileInfo {
@@ -43,12 +42,21 @@ class ProfileWidget {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Column(
               children: [
                 const SizedBox(height: 50),
-                Text(info.target.fullName, style: Theme.of(context).textTheme.title),
-                info.isCurrentUser ? RaisedButton(child: Text("Logout"), onPressed: () {
-                  SessionSettings.logout().then((_) {
-                    callback();
-                  });
-                }) : null
+                Text(info.target.fullName, style: Theme.of(context).textTheme.headline6),
+                info.isCurrentUser ? Column(
+                  children: [
+                    RaisedButton(child: Text("Edit profile"), onPressed: () {
+                      SessionSettings.logout().then((_) {
+                        callback();
+                      });
+                    }),
+                    RaisedButton(child: Text("Logout"), onPressed: () {
+                      SessionSettings.logout().then((_) {
+                        callback();
+                      });
+                    }),
+                  ]
+                ) : SizedBox.shrink()
               ],
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,

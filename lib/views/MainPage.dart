@@ -5,7 +5,6 @@ import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/repositories/ChatRepository.dart';
 import 'package:chatapp/views/ProfileWidget.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'LoginPage.dart';
 

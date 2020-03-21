@@ -1,4 +1,3 @@
-import 'package:chatapp/SessionSettings.dart';
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/repositories/BaseRepository.dart';
 

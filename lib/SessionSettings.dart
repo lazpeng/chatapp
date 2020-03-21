@@ -20,7 +20,7 @@ class SessionSettings {
     return settings;
   }
 
-  static void login(String id, String token) async {
+  static Future login(String id, String token) async {
     var pref = await SharedPreferences.getInstance();
 
     pref.setString(_KEY_TOKEN, token);

@@ -1,6 +1,5 @@
 import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/services/AccountService.dart';
 import 'package:chatapp/views/MainPage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

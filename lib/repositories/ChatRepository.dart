@@ -2,7 +2,6 @@ import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/ChatModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
 import 'package:chatapp/repositories/BaseRepository.dart';
-import 'package:chatapp/repositories/UserRepository.dart';
 
 class ChatRepository extends BaseRepository {
   Future<List<MessageModel>> getMessagesForChat(String userId) async {
