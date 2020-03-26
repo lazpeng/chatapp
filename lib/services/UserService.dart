@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chatapp/models/UserModel.dart';
+import 'package:chatapp/models/requests/LoginRequest.dart';
 import 'package:chatapp/repositories/UserRepository.dart';
 import 'package:chatapp/services/BaseService.dart';
 import 'package:chatapp/services/SessionService.dart';
@@ -8,6 +9,18 @@ import 'package:http/http.dart';
 
 class UserService extends BaseService {
   SessionService _sessionService = new SessionService();
+
+  Future<List<UserModel>> getFriends() async {
+
+  }
+
+  Future<List<UserModel>> getPendingFriendRequests() async {
+
+  }
+
+  Future<List<UserModel>> getBlockedUsers() async {
+
+  }
 
   Future<UserModel> getUser(String id) async {
     var cached = await userRepository.getUser(id);
@@ -32,6 +45,16 @@ class UserService extends BaseService {
     }
 
     return cached;
+  }
+
+  Future<String> performLogin(LoginRequest login) async {
+    var result = await _sessionService.performLogin(login);
+    if(result.isNotEmpty) {
+      return result;
+    }
+
+    // TODO: Login init
+    return result;
   }
 
   Future<String> register(UserModel user) async {

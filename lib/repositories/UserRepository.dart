@@ -36,7 +36,7 @@ class UserRepository extends BaseRepository {
   Future<List<UserModel>> getFriends() async {
     var db = await getDatabase();
 
-    var query = "SELECT * FROM Friends f INNER JOIN KnownUsers ON Id = UserId WHERE DateAccepted IS NOT NULL";
+    var query = "SELECT * FROM Friends INNER JOIN KnownUsers ON Id = UserId WHERE DateAccepted IS NOT NULL";
 
     var rows = await db.rawQuery(query);
     var results = new List<UserModel>();

@@ -1,5 +1,5 @@
 import 'package:chatapp/models/requests/LoginRequest.dart';
-import 'package:chatapp/services/SessionService.dart';
+import 'package:chatapp/services/UserService.dart';
 import 'package:chatapp/views/RegisterPage.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   String _username = "";
   String _password = "";
   bool _appearOffline = false;
-  final SessionService _sessionService = new SessionService();
+  final UserService _userService = new UserService();
 
   var duringLogin = false;
 
@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              Text("Logging in...", style: Theme.of(context).textTheme.subtitle),
+              Text("Logging in...", style: Theme.of(context).textTheme.subtitle2),
               const SizedBox(height: 30),
               CircularProgressIndicator()
             ],
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 100),
-                  Text("Login", style: Theme.of(context).textTheme.headline),
+                  Text("Login", style: Theme.of(context).textTheme.headline5),
                   Padding(
                     padding: EdgeInsets.only(left: 15, right: 15, top: 75),
                     child: TextFormField(
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         _appearOffline = value;
                         setState(() {});
                       }),
-                      Text("Appear offline", style: Theme.of(context).textTheme.body2)
+                      Text("Appear offline", style: Theme.of(context).textTheme.bodyText1)
                     ],
                   ),
                   const SizedBox(height: 50),
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                                   loginRequest.password = _password;
                                   loginRequest.appearOffline = _appearOffline;
 
-                                  _sessionService.performLogin(loginRequest).then((message) {
+                                  _userService.performLogin(loginRequest).then((message) {
                                     if(message.isEmpty) {
                                       // Login was a success
                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                       return showDialog(context: context, builder: (_) {
                                         return AlertDialog(
-                                          title: Text("Login", style: Theme.of(context).textTheme.subtitle),
+                                          title: Text("Login", style: Theme.of(context).textTheme.subtitle2),
                                           content: Text("An error ocurred during login: $message")
                                         );
                                       });

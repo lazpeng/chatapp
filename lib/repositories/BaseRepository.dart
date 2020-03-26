@@ -25,7 +25,11 @@ abstract class BaseRepository {
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Chats (UserId CHAR(36) PRIMARY KEY, LastMessageId INT NOT NULL) ");
 
-    await db.rawQuery("CREATE TABLE IF NOT EXISTS Logs (Id PRIMARY KEY AUTO INCREMENT, Date DATE NOT NULL, Message TEXT NOT NULL, Error BOOL NOT NULL)");
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS Logs (Id PRIMARY KEY AUTO INCREMENT, LogDate DATE NOT NULL, Message TEXT NOT NULL, Error BOOL NOT NULL)");
+
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS EditHistory (Id PRIMARY KEY, MessageId INT NOT NULL, EditDate DATE NOT NULL");
+
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS DeleteHistory (Id PRIMARY KEY, MessageId INT NOT NULL, DeleteDate DATE NOT NULL");
   }
 
   static const List<Function> _upgradeFunctions = [
