@@ -12,7 +12,7 @@ abstract class BaseRepository {
     await db.rawQuery("CREATE TABLE IF NOT EXISTS KnownUsers (Id CHAR(36) PRIMARY KEY, Username VARCHAR(128) NOT NULL,"+
      " FullName VARCHAR(256) NOT NULL, Email VARCHAR(256), Bio TEXT, AccountCreated TIMESTAMPTZ NOT NULL," +
      " LastLogin TIMESTAMPTZ NOT NULL, LastSeen TIMESTAMPTZ NOT NULL, DateOfBirth DATE NOT NULL, FindInSearch BOOL NOT NULL," +
-     " OpenChat BOOL NOT NULL)");
+     " OpenChat BOOL NOT NULL, DataHash CHAR(36) NOT NULL)");
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Messages (Id INT PRIMARY KEY, FromId CHAR(36) NOT NULL," +
      " ToId CHAR(36) NOT NULL, Content TEXT NOT NULL, InReplyTo INT, DateSent DATETIME NOT NULL," +
@@ -24,6 +24,8 @@ abstract class BaseRepository {
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Blocked (BlockedId CHAR(36) PRIMARY KEY, DateBlocked DATETIME NOT NULL) ");
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Chats (UserId CHAR(36) PRIMARY KEY, LastMessageId INT NOT NULL) ");
+
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS Logs (Id PRIMARY KEY AUTO INCREMENT, Date DATE NOT NULL, Message TEXT NOT NULL, Error BOOL NOT NULL)");
   }
 
   static const List<Function> _upgradeFunctions = [

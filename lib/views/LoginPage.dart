@@ -1,4 +1,5 @@
-import 'package:chatapp/domain/AccountDomain.dart';
+import 'package:chatapp/models/requests/LoginRequest.dart';
+import 'package:chatapp/services/SessionService.dart';
 import 'package:chatapp/views/RegisterPage.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   String _username = "";
   String _password = "";
   bool _appearOffline = false;
+  final SessionService _sessionService = new SessionService();
 
   var duringLogin = false;
 
@@ -28,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              Text("Logging in...", style: Theme.of(context).textTheme.headline6),
+              Text("Logging in...", style: Theme.of(context).textTheme.subtitle),
               const SizedBox(height: 30),
               CircularProgressIndicator()
             ],
@@ -41,28 +43,31 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 100),
-                  Text("Login", style: Theme.of(context).textTheme.headline3),
-                  const SizedBox(height: 75),
-                  TextFormField(
-                    decoration: InputDecoration(icon: Icon(Icons.person), hintText: "Username"),
-                    initialValue: _username,
-                    onChanged: (text) {
-                      _username = text.trim();
-                      setState(() {});
-                    }
+                  Text("Login", style: Theme.of(context).textTheme.headline),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15, top: 75),
+                    child: TextFormField(
+                        decoration: InputDecoration(icon: Icon(Icons.person), hintText: "Username"),
+                        initialValue: _username,
+                        onChanged: (text) {
+                          _username = text.trim();
+                          setState(() {});
+                        }
+                    )
                   ),
-                  const SizedBox(height: 30),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.lock), hintText: "Password"),
-                    obscureText: true,
-                    initialValue: _password,
-                    onChanged: (text) {
-                      _password = text;
-                      setState(() {});
-                    }
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15, top: 30, bottom: 15),
+                    child: TextFormField(
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.lock), hintText: "Password"),
+                        obscureText: true,
+                        initialValue: _password,
+                        onChanged: (text) {
+                          _password = text;
+                          setState(() {});
+                        }
+                    )
                   ),
-                  const SizedBox(height: 15),
                   Row(
                     children: [
                       const SizedBox(width: 25),
@@ -70,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         _appearOffline = value;
                         setState(() {});
                       }),
-                      Text("Appear offline", style: Theme.of(context).textTheme.bodyText2)
+                      Text("Appear offline", style: Theme.of(context).textTheme.body2)
                     ],
                   ),
                   const SizedBox(height: 50),
@@ -85,7 +90,12 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() {
                                   duringLogin = true;
 
-                                  accountDomain.performLogin(_username, _password, false).then((message) {
+                                  var loginRequest = new LoginRequest();
+                                  loginRequest.username = _username;
+                                  loginRequest.password = _password;
+                                  loginRequest.appearOffline = _appearOffline;
+
+                                  _sessionService.performLogin(loginRequest).then((message) {
                                     if(message.isEmpty) {
                                       // Login was a success
                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
@@ -98,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                       return showDialog(context: context, builder: (_) {
                                         return AlertDialog(
-                                          title: Text("Login", style: Theme.of(context).textTheme.headline6),
+                                          title: Text("Login", style: Theme.of(context).textTheme.subtitle),
                                           content: Text("An error ocurred during login: $message")
                                         );
                                       });

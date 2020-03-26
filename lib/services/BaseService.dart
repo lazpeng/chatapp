@@ -1,53 +1,29 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:chatapp/SessionSettings.dart';
+import 'package:chatapp/models/ServerModel.dart';
+import 'package:chatapp/models/requests/ServerRequest.dart';
 import 'package:http/http.dart';
-
-import '../LoginSettings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BaseService {
   String _host = "onakan-chatserver.herokuapp.com";
 
-  String apiUrl(String endpoint) {
-    return "https://$_host/api/$endpoint";
+  Future<ServerModel> getServerInfo() async {
+    return null;
   }
 
-  void ensureSession() async {
-    var session = await SessionSettings.load();
-    var url = apiUrl("session/check");
+  Future<ServerRequest> getServer() async {
+    return null;
+  }
 
-    var body = {
-      "userId": session.userId,
-      "token": session.sessionToken
-    };
+  saveServer(ServerRequest server) async {
+    var pref = await SharedPreferences.getInstance();
+    // TODO
+  }
 
-    var response = await post(url, headers: getHeaders(), body: jsonEncode(body));
-
-    if(response.statusCode == 200) {
-      return;
-    } else if(response.statusCode == HttpStatus.unauthorized) {
-      var login = await LoginSettings.load();
-
-      Map<String, dynamic> body = {
-        "username": login.savedUsername,
-        "password": login.savedPassword,
-        "appearOffline": login.appearOffline
-      };
-
-      response = await post(apiUrl("session/login"), headers: getHeaders(), body: jsonEncode(body));
-
-      if(response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
-        var success = responseBody["success"];
-        if(!success) {
-          throw new Exception(responseBody["errorMessage"]);
-        }
-        var id = responseBody["id"];
-        var token = responseBody["token"];
-        await SessionSettings.login(id, token);
-      }
-    }
+  String apiUrl(String endpoint) {
+    return "https://$_host/api/$endpoint";
   }
 
   Map<String, String> getHeaders() {

@@ -12,7 +12,7 @@ class UserRepository extends BaseRepository {
 
     if(rows.length > 0) {
       var row = rows[0];
-      user = UserModel.fromDatabaseMap(row);
+      user = UserModel.fromDbCursor(row);
     }
 
     await db.close();
@@ -23,10 +23,10 @@ class UserRepository extends BaseRepository {
     var db = await getDatabase();
 
     var query = "INSERT INTO KnownUsers (Id, Username, FullName, Email, Bio, AccountCreated, LastLogin," +
-    " LastSeen, DateOfBirth, FindInSearch, OpenChat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    " LastSeen, DateOfBirth, FindInSearch, OpenChat, DataHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     var params = [user.id, user.username, user.fullName, user.email, user.bio, user.accountCreated.toIso8601String(), user.lastLogin.toIso8601String(),
-      user.lastSeen.toIso8601String(), user.dateOfBirth.toIso8601String(), user.findInSearch, user.openChat];
+      user.lastSeen.toIso8601String(), user.dateOfBirth.toIso8601String(), user.findInSearch, user.openChat, user.dataHash];
 
     await db.rawInsert(query, params);
 
@@ -42,7 +42,7 @@ class UserRepository extends BaseRepository {
     var results = new List<UserModel>();
 
     for(var row in rows) {
-      results.add(UserModel.fromDatabaseMap(row));
+      results.add(UserModel.fromDbCursor(row));
     }
 
     return results;

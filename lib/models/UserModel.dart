@@ -11,6 +11,7 @@ class UserModel {
   String bio;
   bool findInSearch;
   bool openChat;
+  String dataHash;
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -22,6 +23,7 @@ class UserModel {
       "bio": bio,
       "findInSearch": findInSearch,
       "openChat": openChat,
+      "dataHash": dataHash
     };
   }
 
@@ -39,11 +41,12 @@ class UserModel {
     user.lastLogin = DateTime.tryParse(responseMap['lastLogin']);
     user.lastSeen = DateTime.tryParse(responseMap['lastSeen']);
     user.bio = responseMap['bio'];
+    user.dataHash = responseMap['dataHash'];
 
     return user;
   }
 
-  static UserModel fromDatabaseMap(Map<String, dynamic> responseMap) {
+  static UserModel fromDbCursor(Map<String, dynamic> responseMap) {
     var user = new UserModel();
 
     user.id = responseMap['Id'];
@@ -56,7 +59,8 @@ class UserModel {
     user.accountCreated = DateTime.tryParse(responseMap['AccountCreated']);
     user.lastLogin = DateTime.tryParse(responseMap['LastLogin']);
     user.lastSeen = DateTime.tryParse(responseMap['LastSeen']);
-    user.bio = responseMap['bio'];
+    user.bio = responseMap['Bio'];
+    user.dataHash = responseMap['DataHash'];
 
     return user;
   }

@@ -1,5 +1,5 @@
-import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/UserModel.dart';
+import 'package:chatapp/services/UserService.dart';
 import 'package:chatapp/views/MainPage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +17,8 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _findInSearch = true;
   bool _allowMessagesFromEveryone = true;
   DateTime _dateOfBirth = DateTime.now();
+
+  final UserService _userService = new UserService();
 
   bool _loading = false;
 
@@ -47,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
           padding: EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              Text("Creating account...", style: Theme.of(context).textTheme.headline6),
+              Text("Creating account...", style: Theme.of(context).textTheme.display4),
               const SizedBox(height: 30),
               CircularProgressIndicator()
             ],
@@ -64,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                     children: [
                       const SizedBox(height: 100),
-                      Text("Register", style: Theme.of(context).textTheme.headline4),
+                      Text("Register", style: Theme.of(context).textTheme.headline),
                       const SizedBox(height: 40),
                       TextFormField(decoration: InputDecoration(labelText: "Username"), initialValue: _username, onChanged: (text) {
                         _username = text.trim();
@@ -105,9 +107,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       Row(
                         children: [
-                          Text("Date of birth (currently ${formatDob()})"),
+                          Text("Date of birth"),
                           const SizedBox(width: 20),
-                          SizedBox(width: 100, child: RaisedButton(child: Text("Set"), onPressed: () {
+                          SizedBox(width: 175, child: RaisedButton(child: Text("${formatDob()}"), onPressed: () {
                             showDatePicker(context: context, initialDate: _dateOfBirth, 
                                             firstDate: DateTime.fromMillisecondsSinceEpoch(0), 
                                             lastDate: DateTime.now()).then((selected) {
@@ -136,7 +138,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                               _loading = true;
 
-                              accountDomain.registerAccount(user).then((message) {
+                              _userService.register(user).then((message) {
                                 setState(() { _loading = false; });
 
                                 if(message == "") {
@@ -145,7 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 } else {
                                   return showDialog(context: context, builder: (_) {
                                     return AlertDialog(
-                                      title: Text("Login", style: Theme.of(context).textTheme.headline6),
+                                      title: Text("Login", style: Theme.of(context).textTheme.display4),
                                       content: Text("An error ocurred during account creation: $message")
                                     );
                                   });

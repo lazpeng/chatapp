@@ -1,32 +1,18 @@
-import 'package:chatapp/domain/AccountDomain.dart';
 import 'package:chatapp/models/ChatModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
 import 'package:chatapp/repositories/BaseRepository.dart';
 
 class ChatRepository extends BaseRepository {
-  Future<List<MessageModel>> getMessagesForChat(String userId) async {
+  Future<List<MessageModel>> getMessagesForChat(String currentUser, String userId) async {
     var db = await getDatabase();
     var messages = new List<MessageModel>();
 
-    var me = await accountDomain.getCurrentUser();
-
     var query = "SELECT * FROM Messages WHERE (SourceId = ? AND TargetId=?) OR (TargetId=? AND SourceId=?)";
 
-    var cursor = await db.rawQuery(query, [me.id, userId, me.id, userId]);
+    var cursor = await db.rawQuery(query, [currentUser, userId, currentUser, userId]);
 
     for(var row in cursor) {
-      var message = new MessageModel();
-      message.id = row['Id'];
-      message.content = row['Content'];
-      message.dateSeen = DateTime.tryParse(row['m.DateSeen']);
-      message.dateSent = DateTime.tryParse(row['m.DateSent']);
-      message.sourceId = row['FromId'];
-      message.targetId = row['ToId'];
-      message.inReplyTo = row['InReplyTo'];
-      message.edited = row['Edited'];
-      message.deleted = row['Deleted'];
-
-      messages.add(message);
+      messages.add(MessageModel.fromDbCursor(row));
     }
 
     await db.close();
@@ -65,7 +51,7 @@ class ChatRepository extends BaseRepository {
     await db.close();
   }
 
-  Future saveNewMessage(MessageModel model) async {
+  Future saveNewMessage(String currentUser, MessageModel model) async {
     var db = await getDatabase();
 
     var query = "INSERT INTO Messages (Id, Content, FromId, ToId, Edited, Deleted, DateSent, DateSeen, InReplyTo)" +
@@ -77,10 +63,8 @@ class ChatRepository extends BaseRepository {
 
     await db.close();
 
-    var me = await accountDomain.getCurrentUser();
-
     var userId;
-    if(model.sourceId == me.id) {
+    if(model.sourceId == currentUser) {
       userId = model.targetId;
     } else {
       userId = model.sourceId;
@@ -89,24 +73,17 @@ class ChatRepository extends BaseRepository {
     await updateChat(userId, model.id);
   }
 
-  Future<List<ChatModel>> getActiveChats() async {
+  Future<List<ChatModel>> getActiveChats(String currentUser) async {
     var result = new List<ChatModel>();
-
-    var me = await accountDomain.getCurrentUser();
 
     var db = await getDatabase();
 
-    var cursor = await db.rawQuery("SELECT u.Username, m.Content, m.DateSeen, m.FromId, m.DateSent FROM Chats" +
-      " c INNER JOIN KnownUsers u on u.Id = c.UserId INNER JOIN Messages m on c.LastMessageId = m.Id");
+    var cursor = await db.rawQuery("SELECT u.Username, m.Content, m.DateSeen, m.FromId, m.DateSent,"+
+        "(CASE WHEN m.FromId = @CurrentUser THEN 1 ELSE 0 END) AS isMine FROM Chats" +
+        " c INNER JOIN KnownUsers u on u.Id = c.UserId INNER JOIN Messages m on c.LastMessageId = m.Id");
     
     for(var row in cursor) {
-      var current = new ChatModel();
-      current.username = row['u.Username'];
-      current.lastMessage = row['m.Content'];
-      current.isSeen = row['m.DateSeen'] != null;
-      current.lastSentDate = DateTime.tryParse(row['m.DateSent']);
-      current.isMine = row['m.FromId'] == me.username;
-
+      var current = ChatModel.fromDbCursor(row);
       result.add(current);
     }
 

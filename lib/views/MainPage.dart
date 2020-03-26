@@ -1,9 +1,5 @@
-import 'package:chatapp/SessionSettings.dart';
-import 'package:chatapp/domain/AccountDomain.dart';
-import 'package:chatapp/models/ChatModel.dart';
-import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/repositories/ChatRepository.dart';
-import 'package:chatapp/views/ProfileWidget.dart';
+import 'package:chatapp/models/requests/SessionRequest.dart';
+import 'package:chatapp/services/SessionService.dart';
 import 'package:flutter/material.dart';
 
 import 'LoginPage.dart';
@@ -14,88 +10,35 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
   int _currentNavIndex = 0;
-  ProfileWidget _profileWidget;
-
-  String _formatSentDate(DateTime t) {
-    return "${t.hour}:${t.minute}";
-  }
+  SessionService _sessionService = new SessionService();
 
   Widget _buildChatFragment() {
-    return FutureBuilder<List<ChatModel>>(
-      future: chatRepository.getActiveChats(),
-      builder: (context, AsyncSnapshot<List<ChatModel>> data) {
-        if(data.hasData) {
-          var chats = data.data;
-
-          if(chats.isEmpty) {
-            return Center(child: Text("No active chats yet"));
-          } else {
-            return ListView.builder(
-              itemCount: chats.length,
-              itemBuilder: (context, int index) {
-                var current = chats[index];
-                return ListTile(
-                  leading: CircleAvatar(child: Text(current.username[0].toUpperCase())),
-                  title: Row(
-                    children: [
-                      Text(current.username)
-                    ],
-                  ),
-                  subtitle: Row(
-                    children: [
-                      current.isMine
-                      ? Text(current.lastMessage, overflow: TextOverflow.clip)
-                      : Row(
-                        children: [
-                          Icon(Icons.check),
-                          const SizedBox(width: 5),
-                          Text(current.lastMessage, overflow: TextOverflow.clip),
-                        ],
-                      ),
-                      Text(_formatSentDate(current.lastSentDate))
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  ),
-                );
-              },
-            );
-          }
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      }
-    );
+    return Center(child: Text("No active chats yet"));
   }
 
   Widget _buildFriendListFragment() {
-    return FutureBuilder(
-      future: accountDomain.getFriendList(),
-      builder: (context, AsyncSnapshot<List<UserModel>> bundle) {
-        if(bundle.hasData) {
-          var friends = bundle.data;
+    return Center(
+        child: Column(
+          children: [
+            Text("No friends yet"),
+            const SizedBox(height: 10),
+            RaisedButton(child: Text("Send a friend request"), onPressed: () {},)
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        )
+    );
+  }
 
-          if(friends.length == 0) {
-            return Center(
-              child: Column(
-                children: [
-                  Text("No friends yet"),
-                  const SizedBox(height: 10),
-                  RaisedButton(child: Text("Send a friend request"), onPressed: () {},)
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              )
-            );
-          } else {
-            return null;
-          }
-        } else {
-          return Center(
-            child: CircularProgressIndicator()
-          );
-        }
-      }
+  Widget _buildFriendRequestListFragment() {
+    return Center(
+        child: Text("No pending requests")
+    );
+  }
+
+  Widget _buildBlockListFragment() {
+    return Center(
+        child: Text("No blocked users")
     );
   }
 
@@ -115,8 +58,8 @@ class _MainPageState extends State<MainPage> {
         body: TabBarView(
           children: [
             _buildFriendListFragment(),
-            Text("No pending requests"),
-            Text("No blocked users")
+            _buildFriendRequestListFragment(),
+            _buildBlockListFragment()
           ]
         )
       ),
@@ -129,12 +72,9 @@ class _MainPageState extends State<MainPage> {
         return _buildFriendsFragment();
         break;
       case 2:
-        if(_profileWidget == null) {
-          _profileWidget = new ProfileWidget(null);
-        }
-        return _profileWidget.build(context, () {
-          setState(() {});
-        });
+        return Center(
+          child: Text("<User Profile>")
+        );
         break;
       case 0:
       default:
@@ -145,11 +85,11 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SessionSettings>(
-      future: SessionSettings.load(),
-      builder: (context, AsyncSnapshot<SessionSettings> settings) {
+    return FutureBuilder<SessionRequest>(
+      future: _sessionService.getSessionInformation(),
+      builder: (context, AsyncSnapshot<SessionRequest> settings) {
         if(settings.hasData) {
-          if(settings.data.sessionToken == "") {
+          if(settings.data.token == "" || settings.data.token == null) {
             Future.microtask(() => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => LoginPage())
