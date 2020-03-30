@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class BaseRepository {
+abstract class LocalBaseRepository {
   static const int _latestVersion = 1;
 
   static _v0(Database db) async {

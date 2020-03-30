@@ -1,46 +1,34 @@
-import 'dart:convert';
-
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/requests/LoginRequest.dart';
-import 'package:chatapp/repositories/UserRepository.dart';
-import 'package:chatapp/services/BaseService.dart';
+import 'package:chatapp/repositories/api/ApiUserRepository.dart';
+import 'package:chatapp/repositories/local/LocalUserRepository.dart';
 import 'package:chatapp/services/SessionService.dart';
-import 'package:http/http.dart';
 
-class UserService extends BaseService {
-  SessionService _sessionService = new SessionService();
+class UserService {
+  final SessionService _sessionService = SessionService();
+  final LocalUserRepository _localUserRepository = LocalUserRepository();
+  final ApiUserRepository _apiUserRepository = ApiUserRepository();
 
   Future<List<UserModel>> getFriends() async {
-
+    return null;
   }
 
   Future<List<UserModel>> getPendingFriendRequests() async {
-
+    return null;
   }
 
   Future<List<UserModel>> getBlockedUsers() async {
-
+    return null;
   }
 
   Future<UserModel> getUser(String id) async {
-    var cached = await userRepository.getUser(id);
+    var cached = await _localUserRepository.getUser(id);
 
     if(cached == null) {
-      var session = await _sessionService.getSessionInformation();
-      var url = apiUrl("user/$id");
+      cached = await _apiUserRepository.getUser(id);
 
-      var body = { "sourceId": session.userId, "token": session.token };
-
-      var response = await post(url, headers: getHeaders(), body: jsonEncode(body));
-
-      if(response.statusCode == 200) {
-        var responseMap = jsonDecode(response.body);
-        var user = UserModel.fromJsonMap(responseMap);
-
-        userRepository.saveUser(user);
-        cached = user;
-      } else {
-        cached = null;
+      if(cached != null) {
+        _localUserRepository.saveUser(cached);
       }
     }
 
@@ -58,28 +46,6 @@ class UserService extends BaseService {
   }
 
   Future<String> register(UserModel user) async {
-    var errorMessage = "";
-
-    try {
-      var url = apiUrl("user/register");
-
-      var body = user.toJsonMap();
-
-      var response = await post(url, body: jsonEncode(body), headers: getHeaders());
-
-      if(response.statusCode == 200) {
-        var responseMap = jsonDecode(response.body);
-
-        if(responseMap['id'] == null) {
-          errorMessage = response.body;
-        }
-      } else {
-        errorMessage = response.body;
-      }
-    } catch (e) {
-      errorMessage = e.toString();
-    }
-
-    return errorMessage;
+    return await _apiUserRepository.register(user);
   }
 }

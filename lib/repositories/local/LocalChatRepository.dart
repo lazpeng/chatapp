@@ -1,8 +1,9 @@
 import 'package:chatapp/models/ChatModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
-import 'package:chatapp/repositories/BaseRepository.dart';
 
-class ChatRepository extends BaseRepository {
+import 'LocalBaseRepository.dart';
+
+class LocalChatRepository extends LocalBaseRepository {
   Future<List<MessageModel>> getMessagesForChat(String currentUser, String userId) async {
     var db = await getDatabase();
     var messages = new List<MessageModel>();
@@ -108,8 +109,4 @@ class ChatRepository extends BaseRepository {
     await db.close();
     return result;
   }
-
-  ChatRepository._internal();
 }
-
-final chatRepository = ChatRepository._internal();

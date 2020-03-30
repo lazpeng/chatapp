@@ -1,5 +1,6 @@
-import 'package:chatapp/models/requests/SessionRequest.dart';
+import 'package:chatapp/models/requests/CheckRequest.dart';
 import 'package:chatapp/services/SessionService.dart';
+import 'package:chatapp/ui/ChatsView.dart';
 import 'package:flutter/material.dart';
 
 import 'LoginPage.dart';
@@ -12,10 +13,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentNavIndex = 0;
   SessionService _sessionService = new SessionService();
-
-  Widget _buildChatFragment() {
-    return Center(child: Text("No active chats yet"));
-  }
 
   Widget _buildFriendListFragment() {
     return Center(
@@ -78,16 +75,16 @@ class _MainPageState extends State<MainPage> {
         break;
       case 0:
       default:
-        return _buildChatFragment();
+        return new ChatsView();
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SessionRequest>(
-      future: _sessionService.getSessionInformation(),
-      builder: (context, AsyncSnapshot<SessionRequest> settings) {
+    return FutureBuilder<CheckRequest>(
+      future: _sessionService.getSavedToken(),
+      builder: (context, AsyncSnapshot<CheckRequest> settings) {
         if(settings.hasData) {
           if(settings.data.token == "" || settings.data.token == null) {
             Future.microtask(() => Navigator.pushReplacement(

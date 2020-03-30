@@ -1,7 +1,7 @@
 import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/repositories/BaseRepository.dart';
+import 'LocalBaseRepository.dart';
 
-class UserRepository extends BaseRepository {
+class LocalUserRepository extends LocalBaseRepository {
   Future<UserModel> getUser(String id) async {
     var db = await getDatabase();
 
@@ -47,8 +47,4 @@ class UserRepository extends BaseRepository {
 
     return results;
   }
-
-  UserRepository._internal();
 }
-
-final userRepository = UserRepository._internal();

@@ -9,8 +9,19 @@ class MessageModel {
   bool edited;
   bool deleted;
 
-  static MessageModel fromJsonMap(Map<String, dynamic> map) {
+  static MessageModel fromJsonMap(Map<String, dynamic> row) {
+    var message = new MessageModel();
+    message.id = row['id'];
+    message.content = row['content'];
+    message.dateSeen = DateTime.tryParse(row['dateSeen']);
+    message.dateSent = DateTime.tryParse(row['dateSent']);
+    message.sourceId = row['fromId'];
+    message.targetId = row['toId'];
+    message.inReplyTo = row['inReplyTo'];
+    message.edited = row['edited'];
+    message.deleted = row['deleted'];
 
+    return message;
   }
 
   static MessageModel fromDbCursor(Map<String, dynamic> row) {
@@ -26,9 +37,5 @@ class MessageModel {
     message.deleted = row['Deleted'];
 
     return message;
-  }
-
-  Map<String, dynamic> toJsonMap() {
-
   }
 }

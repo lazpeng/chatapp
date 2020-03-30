@@ -1,6 +1,6 @@
 import 'package:chatapp/models/requests/LoginRequest.dart';
 import 'package:chatapp/services/UserService.dart';
-import 'package:chatapp/views/RegisterPage.dart';
+import 'package:chatapp/ui/RegisterPage.dart';
 import 'package:flutter/material.dart';
 
 import 'MainPage.dart';
@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              Text("Logging in...", style: Theme.of(context).textTheme.subtitle2),
+              Text("Logging in...", style: Theme.of(context).textTheme.subtitle),
               const SizedBox(height: 30),
               CircularProgressIndicator()
             ],
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 100),
-                  Text("Login", style: Theme.of(context).textTheme.headline5),
+                  Text("Login", style: Theme.of(context).textTheme.headline),
                   Padding(
                     padding: EdgeInsets.only(left: 15, right: 15, top: 75),
                     child: TextFormField(
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         _appearOffline = value;
                         setState(() {});
                       }),
-                      Text("Appear offline", style: Theme.of(context).textTheme.bodyText1)
+                      Text("Appear offline", style: Theme.of(context).textTheme.body2)
                     ],
                   ),
                   const SizedBox(height: 50),
@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                       return showDialog(context: context, builder: (_) {
                                         return AlertDialog(
-                                          title: Text("Login", style: Theme.of(context).textTheme.subtitle2),
+                                          title: Text("Login", style: Theme.of(context).textTheme.subtitle),
                                           content: Text("An error ocurred during login: $message")
                                         );
                                       });

@@ -30,6 +30,7 @@ dependencies:
   http: any
   shared_preferences: any
   intl: any
+  rxdart: any
 
 dev_dependencies:
   flutter_test:
