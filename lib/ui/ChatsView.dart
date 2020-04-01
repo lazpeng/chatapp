@@ -38,12 +38,20 @@ class _ChatsViewState extends State<ChatsView> {
             return ListView.builder(
               itemCount: chats.length,
               itemBuilder: (context, index) {
+                var chat = chats[index];
                 return Card(
                   elevation: 4,
                   child: Row(
                     children: [
-                      Text("Test"),
-                      Text("Test")
+                      CircleAvatar(
+                        child: Text(chat.username.substring(0, 1).toUpperCase()),
+                      ),
+                      Column(
+                        children: [
+                          Text(chat.username),
+                          Text(chat.lastMessage)
+                        ]
+                      )
                     ],
                   )
                 );
