@@ -1,5 +1,5 @@
-import 'package:chatapp/blocs/ChatsBloc.dart';
 import 'package:chatapp/models/ChatModel.dart';
+import 'package:chatapp/services/ChatService.dart';
 import 'package:flutter/material.dart';
 
 class ChatsView extends StatefulWidget {
@@ -8,24 +8,12 @@ class ChatsView extends StatefulWidget {
 }
 
 class _ChatsViewState extends State<ChatsView> {
-  final ChatsBloc _bloc = ChatsBloc();
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc.load();
-  }
-
-  @override
-  void dispose() {
-    _bloc.dispose();
-    super.dispose();
-  }
+  final ChatService _chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _bloc.chatsList,
+    return FutureBuilder(
+      future: _chatService.getChats(),
       builder: (context, AsyncSnapshot<List<ChatModel>> snapshot) {
         if(snapshot.hasData) {
           var chats = snapshot.data;

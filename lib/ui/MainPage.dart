@@ -1,9 +1,11 @@
 import 'package:chatapp/models/requests/CheckRequest.dart';
 import 'package:chatapp/services/SessionService.dart';
 import 'package:chatapp/ui/ChatsView.dart';
+import 'package:chatapp/ui/FriendsView.dart';
 import 'package:flutter/material.dart';
 
 import 'LoginPage.dart';
+import 'ProfileView.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -14,70 +16,12 @@ class _MainPageState extends State<MainPage> {
   int _currentNavIndex = 0;
   SessionService _sessionService = new SessionService();
 
-  Widget _buildFriendListFragment() {
-    return Center(
-        child: Column(
-          children: [
-            Text("No friends yet"),
-            const SizedBox(height: 10),
-            RaisedButton(child: Text("Send a friend request"), onPressed: () {},)
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        )
-    );
-  }
-
-  Widget _buildFriendRequestListFragment() {
-    return Center(
-        child: Text("No pending requests")
-    );
-  }
-
-  Widget _buildBlockListFragment() {
-    return Center(
-        child: Text("No blocked users")
-    );
-  }
-
-  Widget _buildFriendsFragment() {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: TabBar(
-            tabs: [
-              Tab(text: "Friend list"),
-              Tab(text: "Pending"),
-              Tab(text: "Block list")
-            ]
-          )
-        ),
-        body: TabBarView(
-          children: [
-            _buildFriendListFragment(),
-            _buildFriendRequestListFragment(),
-            _buildBlockListFragment()
-          ]
-        )
-      ),
-    );
-  }
-
   Widget _buildCurrentFragment(context) {
-    switch(_currentNavIndex) {
-      case 1:
-        return _buildFriendsFragment();
-        break;
-      case 2:
-        return Center(
-          child: Text("<User Profile>")
-        );
-        break;
-      case 0:
-      default:
-        return new ChatsView();
-        break;
-    }
+    return [ChatsView(), FriendsView(), ProfileView(null, true)][_currentNavIndex];
+  }
+
+  String _getCurrentAppTitle() {
+    return ["Active chats", "Social", "Profile"][_currentNavIndex];
   }
 
   @override
@@ -95,7 +39,7 @@ class _MainPageState extends State<MainPage> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text("Active chats"),
+                title: Text(_getCurrentAppTitle()),
                 actions: [
                   IconButton(icon: Icon(Icons.refresh), onPressed: () {
                     
@@ -109,7 +53,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.people),
-                  title: Text("Friends")
+                  title: Text("Social")
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings),

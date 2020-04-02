@@ -70,4 +70,23 @@ class ApiUserRepository extends ApiBaseRepository {
 
     return errorMessage;
   }
+
+  Future<List<UserModel>> search(String username) async {
+    var url = apiUrl("user/search/$username");
+
+    var response = await get(url, headers: getHeaders());
+
+    if(response.statusCode == 200) {
+      List<UserModel> results = [];
+
+      for(var map in jsonDecode(response.body)) {
+        results.add(UserModel.fromJsonMap(map));
+      }
+
+      return results;
+    } else {
+      print(response.body);
+      return [];
+    }
+  }
 }

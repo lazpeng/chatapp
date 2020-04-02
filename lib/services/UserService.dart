@@ -21,6 +21,12 @@ class UserService {
     return null;
   }
 
+  Future<UserModel> getCurrentUser() async {
+    var saved = await _sessionService.getSavedToken();
+
+    return await getUser(saved.sourceId);
+  }
+
   Future<UserModel> getUser(String id) async {
     var cached = await _localUserRepository.getUser(id);
 
@@ -44,7 +50,24 @@ class UserService {
     return result;
   }
 
+  Future<List<UserModel>> search(String username) async {
+    return await _apiUserRepository.search(username);
+  }
+
   Future<String> register(UserModel user) async {
     return await _apiUserRepository.register(user);
+  }
+
+  Future sendFriendRequest(String userId) async {
+  }
+
+  Future<bool> isFriendsWith(String userId) async {
+
+return false;
+  }
+
+  Future<bool> hasPendingRequestTo(String userId) async {
+
+    return false;
   }
 }
