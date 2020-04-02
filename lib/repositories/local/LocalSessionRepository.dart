@@ -39,7 +39,7 @@ class LocalSessionRepository extends LocalBaseRepository {
     var pref = await SharedPreferences.getInstance();
 
     if(!pref.containsKey(_KEY_TOKEN)) {
-      return null;
+      return new CheckRequest(null, null);
     }
 
     return new CheckRequest(pref.getString(_KEY_USER_ID), pref.getString(_KEY_TOKEN));

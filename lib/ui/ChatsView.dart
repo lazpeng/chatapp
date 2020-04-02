@@ -41,18 +41,26 @@ class _ChatsViewState extends State<ChatsView> {
                 var chat = chats[index];
                 return Card(
                   elevation: 4,
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        child: Text(chat.username.substring(0, 1).toUpperCase()),
-                      ),
-                      Column(
-                        children: [
-                          Text(chat.username),
-                          Text(chat.lastMessage)
-                        ]
-                      )
-                    ],
+                  margin: EdgeInsets.all(5),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(chat.username.substring(0, 1).toUpperCase()),
+                    ),
+                    title: Text(chat.username),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(chat.lastMessage),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(Icons.check),
+                            const SizedBox(width: 5),
+                            Text("22:15")
+                          ]
+                        )
+                      ]
+                    )
                   )
                 );
               },

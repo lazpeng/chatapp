@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/repositories/api/ApiBaseRepository.dart';
@@ -10,8 +11,21 @@ class ApiUserRepository extends ApiBaseRepository {
   final SessionService _sessionService = SessionService();
 
   Future<List<UserModel>> getFriends() async {
-    // TODO: implement getFriends
-    throw UnimplementedError();
+    await _sessionService.ensureSession();
+
+    var session = await _sessionService.getSavedToken();
+
+    var url = apiUrl("friend/?User=${session.sourceId}&Token=${session.token}");
+
+    var response = await get(url, headers: getHeaders());
+
+    if(response.statusCode == 200) {
+      // TODO: Parse this
+    } else {
+      throw new Exception(response.body);
+    }
+
+    return [];
   }
 
   Future<UserModel> getUser(String id) async {
@@ -35,13 +49,13 @@ class ApiUserRepository extends ApiBaseRepository {
     var errorMessage = "";
 
     try {
-      var url = apiUrl("user/register");
+      var url = apiUrl("user");
 
       var body = user.toJsonMap();
 
       var response = await post(url, body: jsonEncode(body), headers: getHeaders());
 
-      if(response.statusCode == 200) {
+      if(response.statusCode == HttpStatus.created) {
         var responseMap = jsonDecode(response.body);
 
         if(responseMap['id'] == null) {

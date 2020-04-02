@@ -49,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
           padding: EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              Text("Creating account...", style: Theme.of(context).textTheme.display4),
+              Text("Creating account...", style: Theme.of(context).textTheme.display1),
               const SizedBox(height: 30),
               CircularProgressIndicator()
             ],

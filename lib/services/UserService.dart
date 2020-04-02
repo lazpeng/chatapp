@@ -41,7 +41,6 @@ class UserService {
       return result;
     }
 
-    // TODO: Login init
     return result;
   }
 

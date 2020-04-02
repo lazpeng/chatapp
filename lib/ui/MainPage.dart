@@ -94,6 +94,14 @@ class _MainPageState extends State<MainPage> {
             return Text("");
           } else {
             return Scaffold(
+              appBar: AppBar(
+                title: Text("Active chats"),
+                actions: [
+                  IconButton(icon: Icon(Icons.refresh), onPressed: () {
+                    
+                  })
+                ]
+              ),
               bottomNavigationBar: BottomNavigationBar(items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.message),
