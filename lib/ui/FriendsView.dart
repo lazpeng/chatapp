@@ -1,8 +1,22 @@
+import 'package:chatapp/models/FriendRequestModel.dart';
 import 'package:chatapp/models/UserModel.dart';
+import 'package:chatapp/services/SessionService.dart';
 import 'package:chatapp/services/UserService.dart';
 import 'package:flutter/material.dart';
 
 import 'ProfilePage.dart';
+import 'UserRowWidget.dart';
+
+class _PendingRequest {
+  UserModel user;
+  FriendRequestModel request;
+}
+
+class _FriendRequestResult {
+  String currentUser;
+  List<UserModel> sentRequests = [];
+  List<_PendingRequest> pendingRequests = [];
+}
 
 class FriendsView extends StatefulWidget {
   @override
@@ -11,6 +25,7 @@ class FriendsView extends StatefulWidget {
 
 class _FriendsViewState extends State<FriendsView> {
   final UserService _userService = UserService();
+  final SessionService _sessionService = SessionService();
   bool _searchEnabled = false;
   String _searchUsername = "";
   bool _loading = false;
@@ -21,15 +36,129 @@ class _FriendsViewState extends State<FriendsView> {
     super.initState();
   }
 
-    Widget _buildFriendListFragment() {
-    return Center(
-      child: Text("No friends yet")
+  Future<_FriendRequestResult> getFriendRequests() async {
+    var requests = await _userService.getPendingFriendRequests();
+    var current = await _sessionService.getSavedToken();
+
+    var result = new _FriendRequestResult();
+    result.currentUser = current.sourceId;
+
+    for(var request in requests) {
+      var associated = await _userService.getUser(request.userId);
+
+      if(request.isMine) {
+        result.sentRequests.add(associated);
+      } else {
+        var req = new _PendingRequest();
+        req.request = request;
+        req.user = associated;
+
+        result.pendingRequests.add(req);
+      }
+    }
+
+    return result;
+  }
+
+  Widget _buildFriendListFragment() {
+    return FutureBuilder(
+      future: _userService.getFriends(),
+      builder: (context, AsyncSnapshot<List<UserModel>> snapshot) {
+        if(snapshot.hasData) {
+          var users = snapshot.data;
+
+          if(users.isEmpty) {
+            return Center(
+                child: Text("No friends yet")
+            );
+          } else {
+            return ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                var user = users[index];
+
+                return UserRowWidget(user);
+              },
+            );
+          }
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      }
     );
   }
 
+  Widget _buildSentRequests(_FriendRequestResult result) {
+    if(result.sentRequests.isEmpty) {
+      return Center(child: Text("No sent requests"));
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: result.sentRequests.length,
+          itemBuilder: (context, index) {
+            var item = result.sentRequests[index];
+
+            return UserRowWidget(item);
+          },
+        )
+      );
+    }
+  }
+
+  void answerFriendRequest(int id, bool answer) {
+    Future.microtask(() async {
+      await _userService.answerFriendRequest(id, answer);
+
+      await _userService.refreshFriendList();
+      await _userService.refreshFriendList();
+    }).whenComplete(() {
+      setState(() {});
+    });
+  }
+
+  Widget _buildReceivedRequests(_FriendRequestResult result) {
+    if(result.pendingRequests.isEmpty) {
+      return Center(child: Text("No pending requests"));
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: result.pendingRequests.length,
+          itemBuilder: (context, index) {
+            var item = result.pendingRequests[index];
+
+            return UserRowWidget(item.user);
+          },
+        )
+      );
+    }
+  }
+
   Widget _buildFriendRequestListFragment() {
-    return Center(
-        child: Text("No pending requests")
+    return FutureBuilder(
+      future: getFriendRequests(),
+      builder: (context, AsyncSnapshot<_FriendRequestResult> snapshot) {
+        if(snapshot.hasData) {
+          var requests = snapshot.data;
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Center(child: Text("Pending requests", style: Theme.of(context).textTheme.headline)),
+              const SizedBox(height: 15),
+              _buildReceivedRequests(requests),
+
+              const SizedBox(height: 30),
+              
+              Center(child: Text("Sent requests", style: Theme.of(context).textTheme.headline)),
+              const SizedBox(height: 15),
+              _buildSentRequests(requests),
+            ],
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      }
     );
   }
 
@@ -89,23 +218,7 @@ class _FriendsViewState extends State<FriendsView> {
               itemBuilder: (context, index) {
                 var user = _searchResults[index];
 
-                return Card(
-                  elevation: 4,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(user.username.substring(0, 1).toUpperCase()),
-                    ),
-                    title: Text(user.username),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => ProfilePage(user.id),
-                        )
-                      );
-                    },
-                  )
-                );
+                return UserRowWidget(user);
               },
             )
           )

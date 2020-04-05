@@ -30,6 +30,8 @@ abstract class LocalBaseRepository {
     await db.rawQuery("CREATE TABLE IF NOT EXISTS EditHistory (Id INTEGER PRIMARY KEY, MessageId INT NOT NULL, EditDate DATE NOT NULL)");
 
     await db.rawQuery("CREATE TABLE IF NOT EXISTS DeleteHistory (Id INTEGER PRIMARY KEY, MessageId INT NOT NULL, DeleteDate DATE NOT NULL)");
+
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS Requests (Id INTEGER PRIMARY KEY, UserId CHAR(36) NOT NULL, Mine BOOL NOT NULL, SentDate DATE NOT NULL)");
   }
 
   static const List<Function> _upgradeFunctions = [

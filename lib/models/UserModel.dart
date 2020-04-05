@@ -37,9 +37,15 @@ class UserModel {
     user.findInSearch = responseMap['findInSearch'] == 1;
     user.openChat = responseMap['openChat'] == 1;
     user.dateOfBirth = DateTime.tryParse(responseMap['dateOfBirth']);
-    user.accountCreated = DateTime.tryParse(responseMap['accountCreated']);
+    if(responseMap['accountCreated'] != null) {
+      user.accountCreated = DateTime.tryParse(responseMap['accountCreated']);
+    }
+    if(responseMap['lastLogin'] != null) {
     user.lastLogin = DateTime.tryParse(responseMap['lastLogin']);
+    }
+    if(responseMap['lastSeen'] != null) {
     user.lastSeen = DateTime.tryParse(responseMap['lastSeen']);
+    }
     user.bio = responseMap['bio'];
     user.dataHash = responseMap['dataHash'];
 

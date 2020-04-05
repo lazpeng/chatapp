@@ -1,5 +1,6 @@
 import 'package:chatapp/models/requests/CheckRequest.dart';
 import 'package:chatapp/services/SessionService.dart';
+import 'package:chatapp/services/UserService.dart';
 import 'package:chatapp/ui/ChatsView.dart';
 import 'package:chatapp/ui/FriendsView.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentNavIndex = 0;
   SessionService _sessionService = new SessionService();
+  UserService _userService = new UserService();
 
   Widget _buildCurrentFragment(context) {
     return [ChatsView(), FriendsView(), ProfileView(null, true)][_currentNavIndex];
@@ -42,7 +44,9 @@ class _MainPageState extends State<MainPage> {
                 title: Text(_getCurrentAppTitle()),
                 actions: [
                   IconButton(icon: Icon(Icons.refresh), onPressed: () {
-                    
+                    _userService.refreshAll().catchError((err) {
+                      print(err);
+                    });
                   })
                 ]
               ),

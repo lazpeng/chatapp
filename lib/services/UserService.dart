@@ -1,3 +1,4 @@
+import 'package:chatapp/models/FriendRequestModel.dart';
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/requests/LoginRequest.dart';
 import 'package:chatapp/repositories/api/ApiUserRepository.dart';
@@ -10,15 +11,15 @@ class UserService {
   final ApiUserRepository _apiUserRepository = ApiUserRepository();
 
   Future<List<UserModel>> getFriends() async {
-    return null;
+    return await _localUserRepository.getFriends();
   }
 
-  Future<List<UserModel>> getPendingFriendRequests() async {
-    return null;
+  Future<List<FriendRequestModel>> getPendingFriendRequests() async {
+    return await _localUserRepository.getRequests();
   }
 
   Future<List<UserModel>> getBlockedUsers() async {
-    return null;
+    return await _localUserRepository.getBlockedUsers();
   }
 
   Future<UserModel> getCurrentUser() async {
@@ -42,6 +43,8 @@ class UserService {
   }
 
   Future<String> performLogin(LoginRequest login) async {
+    await _localUserRepository.deletePersonalInfo();
+
     var result = await _sessionService.performLogin(login);
     if(result.isNotEmpty) {
       return result;
@@ -59,15 +62,63 @@ class UserService {
   }
 
   Future sendFriendRequest(String userId) async {
+    await _apiUserRepository.sendFriendRequest(userId);
+  }
+
+  Future answerFriendRequest(int id, bool answer) async {
+    await _apiUserRepository.answerFriendRequest(id, answer);
   }
 
   Future<bool> isFriendsWith(String userId) async {
-
-return false;
+    return _localUserRepository.isFriendsWith(userId);
   }
 
   Future<bool> hasPendingRequestTo(String userId) async {
+    return await _localUserRepository.hasPendingRequestTo(userId);
+  }
 
-    return false;
+  Future<bool> hasPendingRequestFrom(String userId) async {
+    return await _localUserRepository.hasPendingRequestFrom(userId);
+  }
+
+  Future refreshFriendList() async {
+    var friends = await _apiUserRepository.getFriends();
+
+    await _localUserRepository.deleteFriends();
+
+    for(var friend in friends) {
+      await _localUserRepository.saveFriend(friend);
+    }
+  }
+
+  Future refreshUsers() async {
+    // TODO
+  }
+
+  Future refreshRequests() async {
+    var requests = await _apiUserRepository.getRequests();
+
+    await _localUserRepository.deleteRequests();
+    var currentUser = await _sessionService.getSavedToken();
+
+    for(var req in requests) {
+      await _localUserRepository.saveRequest(req, currentUser.sourceId);
+    }
+  }
+
+  Future refreshBlocked() async {
+    var blocked = await _apiUserRepository.getBlocked();
+
+    await _localUserRepository.deleteBlocked();
+    for(var b in blocked) {
+      await _localUserRepository.saveBlocked(b);
+    }
+  }
+
+  Future refreshAll() async {
+    await refreshFriendList();
+    await refreshUsers();
+    await refreshRequests();
+    await refreshBlocked();
   }
 }

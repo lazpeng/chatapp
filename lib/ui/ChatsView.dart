@@ -10,6 +10,14 @@ class ChatsView extends StatefulWidget {
 class _ChatsViewState extends State<ChatsView> {
   final ChatService _chatService = ChatService();
 
+  Widget _messageInfo(ChatModel message) {
+    if(message.isSeen) {
+      return Icon(Icons.check, color: Colors.cyan);
+    } else {
+      return Icon(Icons.check);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -42,7 +50,7 @@ class _ChatsViewState extends State<ChatsView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Icon(Icons.check),
+                            chat.isMine ? const SizedBox() : _messageInfo(chat),
                             const SizedBox(width: 5),
                             Text("22:15")
                           ]

@@ -26,6 +26,10 @@ class SessionService {
     return await _localSessionRepository.getSavedToken();
   }
 
+  Future logout() async {
+    await _localSessionRepository.saveToken(null);
+  }
+
   Future ensureSession() async {
     var session = await _localSessionRepository.getSavedToken();
     

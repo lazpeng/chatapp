@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chatapp/models/FriendModel.dart';
+import 'package:chatapp/models/FriendRequestModel.dart';
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/repositories/api/ApiBaseRepository.dart';
 import 'package:chatapp/services/SessionService.dart';
@@ -10,7 +12,7 @@ import 'package:http/http.dart';
 class ApiUserRepository extends ApiBaseRepository {
   final SessionService _sessionService = SessionService();
 
-  Future<List<UserModel>> getFriends() async {
+  Future<List<FriendModel>> getFriends() async {
     await _sessionService.ensureSession();
 
     var session = await _sessionService.getSavedToken();
@@ -19,13 +21,106 @@ class ApiUserRepository extends ApiBaseRepository {
 
     var response = await get(url, headers: getHeaders());
 
+    List<FriendModel> results = [];
+
     if(response.statusCode == 200) {
-      // TODO: Parse this
+      var map = jsonDecode(response.body);
+
+      for(var row in map) {
+        var friend = new FriendModel();
+        friend.userId = row['sourceId'] == session.sourceId ? row['targetId'] : row['sourceId'];
+        friend.dateSent = DateTime.tryParse(row['requestSent']);
+
+        results.add(friend);
+      }
     } else {
       throw new Exception(response.body);
     }
 
-    return [];
+    return results;
+  }
+
+  Future sendFriendRequest(String userId) async {
+    await _sessionService.ensureSession();
+    var session = await _sessionService.getSavedToken();
+
+    var body = {
+      'sourceId': session.sourceId,
+      'token': session.token
+    };
+
+    var url = apiUrl("friend/request/$userId");
+    var response = await post(url, headers: getHeaders(), body: jsonEncode(body));
+
+    if(response.statusCode != 200) {
+      print(response.body);
+    }
+  }
+
+  Future answerFriendRequest(int id, bool answer) async {
+    await _sessionService.ensureSession();
+    var session = await _sessionService.getSavedToken();
+
+    var body = {
+      'sourceId': session.sourceId,
+      'token': session.token,
+      'accepted': answer
+    };
+
+    var url = apiUrl("friend/request/$id");
+    var response = await put(url, headers: getHeaders(), body: jsonEncode(body));
+
+    if(response.statusCode != 200) {
+      print(response.body);
+    }
+  }
+
+  Future<List<String>> getBlocked() async {
+   await _sessionService.ensureSession();
+
+    var session = await _sessionService.getSavedToken();
+
+    var url = apiUrl("block/?SourceId=${session.sourceId}&Token=${session.token}");
+
+    var response = await get(url, headers: getHeaders());
+
+    List<String> results = [];
+
+    if(response.statusCode == 200) {
+      var map = jsonDecode(response.body);
+
+      for(var row in map) {
+        results.add(row['blockedUser']);
+      }
+    } else {
+      throw new Exception(response.body);
+    }
+
+    return results;
+  }
+
+  Future<List<FriendRequestModel>> getRequests() async {
+    await _sessionService.ensureSession();
+
+    var session = await _sessionService.getSavedToken();
+
+    var url = apiUrl("friend/request?User=${session.sourceId}&Token=${session.token}");
+
+    var response = await get(url, headers: getHeaders());
+
+    List<FriendRequestModel> results = [];
+
+    if(response.statusCode == 200) {
+      var map = jsonDecode(response.body);
+
+      for(var row in map) {
+        results.add(FriendRequestModel.fromJsonMap(row));
+      }
+    } else {
+      throw new Exception(response.body);
+    }
+
+    return results;
   }
 
   Future<UserModel> getUser(String id) async {
